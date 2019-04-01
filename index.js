@@ -28,7 +28,7 @@ app.get('/pokemon', (req, res) => {
 });
 
 app.get('/pokemon/:id', (req, res) => {
-  const id = req.params.id;
+  const id = req.params.id || 'ditto';
 
   const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
   axios
