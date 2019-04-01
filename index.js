@@ -60,6 +60,8 @@ app.get('/pokemon/:id', (req, res) => {
     });
 });
 
-app.listen('8000', () => {
-  console.log('listening');
+const portNumber = process.env.PORT || 8000;
+
+app.listen(portNumber, () => {
+  console.log(`listening on ${portNumber}`);
 });
