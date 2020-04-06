@@ -1,52 +1,60 @@
-const express = require('express');
-const axios = require('axios');
+const express = require("express");
+const fetch = require("isomorphic-fetch");
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+app.use((_, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
 });
 
-app.get('/', (req, res) => {
-  console.log(res);
-
+app.get("/", (_, res) => {
   res.status(401).send({
-    errors: [{ status: 401, title: 'Not Found', detail: 'The requested uri was not found.' }]
+    errors: [
+      {
+        status: 401,
+        title: "Not Found",
+        detail: "The requested uri was not found."
+      }
+    ]
   });
 });
 
-app.get('/pokemon', (req, res) => {
+app.get("/pokemon", (_, res) => {
   const url = `https://pokeapi.co/api/v2/pokemon/?limit=150`;
-  axios
-    .get(url)
-    .then((response) => {
-      const pokemon = response.data.results.sort(function(a, b) {
+  fetch(url)
+    .then(response => response.json())
+    .then(response => {
+      const pokemon = response.results.sort(function (a, b) {
         return a.name.localeCompare(b.name);
       });
       res.send(pokemon);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
-      res.status(500).send('Error has occurred');
+      res.status(500).send("Error has occurred");
     });
 });
 
-app.get('/pokemon/:id', (req, res) => {
-  const id = req.params.id || 'ditto';
+app.get("/pokemon/:id", (req, res) => {
+  const id = req.params.id || "ditto";
 
   const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
-  axios
-    .get(url)
-    .then((response) => {
-      const { height, weight } = response.data;
-      const pokeImage = response.data.sprites.front_default;
-      const moves = response.data.moves.map((move) => {
-        return move['move'].name;
+  fetch(url)
+    .then(response => response.json())
+    .then(response => {
+      console.log(response);
+      const { height, weight } = response;
+      const pokeImage = response.sprites.front_default;
+      const moves = response.moves.map(move => {
+        return move["move"].name;
       });
-      const types = response.data.types.map((type) => {
-        return type['type'].name;
+      const types = response.types.map(type => {
+        return type["type"].name;
       });
 
       res.send({
@@ -60,9 +68,9 @@ app.get('/pokemon/:id', (req, res) => {
       });
     })
 
-    .catch((error) => {
+    .catch(error => {
       console.log(error);
-      res.status(500).send('Error has occurred');
+      res.status(500).send("Error has occurred");
     });
 });
 
